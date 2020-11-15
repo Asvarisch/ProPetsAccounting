@@ -32,10 +32,10 @@ public class UserAccount implements Serializable{
 	String password;
 	String avatar;
 	String phone;
-	boolean isBlocked;
+	//boolean isBlocked;
 	List<String> roles = new ArrayList<>();
-	Set<String> favorites = new HashSet<>();
-	Set<String> activity = new HashSet<>();
+//	Set<String> favorites = new HashSet<>();
+//	Set<String> activity = new HashSet<>();
 	
 	public boolean addRole(String role) {
 		return roles.add(role);
@@ -45,20 +45,20 @@ public class UserAccount implements Serializable{
 		return roles.remove(role);
 	}
 	
-	public void addFavoritePost(String id) {
-		favorites.add(id);
-	}
-	
-	public void removeFavoritePost(String id) {
-		favorites.remove(id);
-	}
-	
-	public void addUserPost(String id) {
-		activity.add(id);
-	}
-	
-	public void removeUserPost(String id) {
-		activity.remove(id);
-	}
+//	public void addFavoritePost(String id) {
+//		favorites.add(id);
+//	}
+//	
+//	public void removeFavoritePost(String id) {
+//		favorites.remove(id);
+//	}
+//	
+//	public void addUserPost(String id) {
+//		activity.add(id);
+//	}
+//	
+//	public void removeUserPost(String id) {
+//		activity.remove(id);
+//	}
 
 }

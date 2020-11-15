@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import telran.ashkelon2020.accounting.dto.RolesResponseDto;
 import telran.ashkelon2020.accounting.dto.UserRegisterDto;
 import telran.ashkelon2020.accounting.dto.UserResponseDto;
-import telran.ashkelon2020.accounting.dto.UserRoleDto;
 import telran.ashkelon2020.accounting.dto.UserUpdateDto;
 import telran.ashkelon2020.accounting.service.UserService;
 
@@ -41,13 +40,13 @@ public class Controller {
 	// LOGIN USER
 	@PostMapping("/login")
 	public UserResponseDto login(Principal principal) {
-		return accountService.getUser(principal.getName());
+		return accountService.login(principal.getName());
 	}
 
-	// USER INFORMATION - check info about user by id/ might be any user
+	// USER INFORMATION - check info about user by id
 	@GetMapping("/{login}/info")
-	public UserResponseDto getUserInfo(@PathVariable String login) {
-		return accountService.getUser(login);
+	public ResponseEntity<UserResponseDto> getUserInfo(@PathVariable String login, @RequestHeader(TOKEN_HEADER) String token) {
+		return accountService.getUserInfo(login, token);
 	}
 
 	// EDIT USER PROFILE
@@ -112,8 +111,8 @@ public class Controller {
 
 	// TOKEN VALIDATION
 	@GetMapping("/token/validation")
-	public ResponseEntity<UserRoleDto> tokenValidation(@RequestHeader(TOKEN_HEADER) String token) {
-		return accountService.tokenValidate(token);
+	public ResponseEntity<String> tokenValidation(@RequestHeader(TOKEN_HEADER) String token) {
+		return accountService.tokenValidation(token);
 	}
 
 }

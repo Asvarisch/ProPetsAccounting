@@ -21,7 +21,7 @@ import telran.ashkelon2020.accounting.dao.UserRepository;
 import telran.ashkelon2020.accounting.dto.RolesResponseDto;
 import telran.ashkelon2020.accounting.dto.UserRegisterDto;
 import telran.ashkelon2020.accounting.dto.UserResponseDto;
-import telran.ashkelon2020.accounting.dto.UserRoleDto;
+import telran.ashkelon2020.accounting.dto.UserInfoDto;
 import telran.ashkelon2020.accounting.dto.UserUpdateDto;
 import telran.ashkelon2020.accounting.dto.exceptions.IncorrectPhoneException;
 import telran.ashkelon2020.accounting.dto.exceptions.IncorrectRegistrationException;
@@ -109,11 +109,25 @@ public class UserServiceImpl implements UserService {
 		 * end-of-string
 		 */
 	}
-
+	
 	@Override
-	public UserResponseDto getUser(String login) {
+	public UserResponseDto login(String login) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
 		return modelMapper.map(userAccount, UserResponseDto.class);
+	}
+
+	@Override
+	public ResponseEntity<UserResponseDto> getUserInfo(String login, String token) {
+		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
+		UserResponseDto userResponseDto = modelMapper.map(userAccount, UserResponseDto.class);
+		UserInfoDto userInfoDto = tokenService.validateToken(token);
+		HttpHeaders headers = new HttpHeaders();
+//		headers.add(TOKEN_HEADER, userInfoDto.getToken());
+//		return new ResponseEntity<UserResponseDto>(userResponseDto, headers, HttpStatus.OK);
+		headers.set(TOKEN_HEADER, userInfoDto.getToken());
+		return ResponseEntity.ok()
+				.headers(headers)
+				.body(userResponseDto);
 	}
 
 	@Override
@@ -169,27 +183,39 @@ public class UserServiceImpl implements UserService {
 	public boolean blockUserAccount(String login, boolean status) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
 		if (status) {
-			userAccount.setBlocked(true);
+//			userAccount.setBlocked(true);
 			repository.save(userAccount);
 			return true;
 		} else {
-			userAccount.setBlocked(false);
+//			userAccount.setBlocked(false);
 			repository.save(userAccount);
 			return false;
 		}
 	}
+	
+	@Override
+	public ResponseEntity<String> tokenValidation(String token) {
+		UserInfoDto userInfoDto = tokenService.validateToken(token);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(TOKEN_HEADER, userInfoDto.getToken());
+		return new ResponseEntity<String>(headers, HttpStatus.OK);
+	}
 
+
+	/////////////////////////////////////////// Methods not relevant for Accounting service-server /////////////////////////////////////////
+	
+	
 	@Override
 	public void addUserFavoritePost(String login, String id) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
-		userAccount.addFavoritePost(id);
+//		userAccount.addFavoritePost(id);
 		repository.save(userAccount);
 	}
 
 	@Override
 	public void addUserActivity(String login, String id) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
-		userAccount.addUserPost(id);
+//		userAccount.addUserPost(id);
 		repository.save(userAccount);
 
 	}
@@ -197,7 +223,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void removeUserFavoritePost(String login, String id) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
-		userAccount.removeFavoritePost(id);
+//		userAccount.removeFavoritePost(id);
 		repository.save(userAccount);
 
 	}
@@ -205,7 +231,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void removeUserActivity(String login, String id) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
-		userAccount.removeUserPost(id);
+//		userAccount.removeUserPost(id);
 		repository.save(userAccount);
 
 	}
@@ -214,19 +240,13 @@ public class UserServiceImpl implements UserService {
 	public Set<String> getUserData(String login, boolean dataType) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
 		if (dataType) {
-			return userAccount.getActivity();
+//			return userAccount.getActivity();
 		} else {
-			return userAccount.getFavorites();
+//			return userAccount.getFavorites();
 		}
+		return null;
 
 	}
 
-	@Override
-	public ResponseEntity<UserRoleDto> tokenValidate(String token) {
-		UserRoleDto userRoleDto = tokenService.validateToken(token);
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(TOKEN_HEADER, userRoleDto.getToken());
-		return new ResponseEntity<UserRoleDto>(userRoleDto, headers, HttpStatus.OK);
-	}
-
+	
 }

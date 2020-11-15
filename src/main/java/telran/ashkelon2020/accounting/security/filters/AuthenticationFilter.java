@@ -21,7 +21,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import telran.ashkelon2020.accounting.dao.UserRepository;
-import telran.ashkelon2020.accounting.dto.UserRoleDto;
+import telran.ashkelon2020.accounting.dto.UserInfoDto;
 import telran.ashkelon2020.accounting.model.UserAccount;
 import telran.ashkelon2020.accounting.service.TokenService;
 
@@ -64,9 +64,9 @@ public class AuthenticationFilter implements Filter {
 					//Token X-Token handling
 					token = request.getHeader(TOKEN_HEADER);
 					if (token != null) {
-						UserRoleDto userRoleDto = tokenService.validateToken(token);
-						login = userRoleDto.getEmail();
-						response.setHeader(TOKEN_HEADER, userRoleDto.getToken());
+						UserInfoDto userInfoDto = tokenService.validateToken(token);
+						login = userInfoDto.getEmail();
+						response.setHeader(TOKEN_HEADER, userInfoDto.getToken());
 					} else {
 						response.sendError(403);
 						return;
@@ -90,6 +90,7 @@ public class AuthenticationFilter implements Filter {
 	private boolean checkEndpoint(String path, String method) {
 		boolean res = path.matches("/account/en/v1/registration/?");
 		res = res || (path.matches("/account/en/v1/token/validation/?") && "GET".equalsIgnoreCase(method));
+		res = res || (path.matches("/account/en/v1/\\w+@\\w+.\\w+/info/?") && "GET".equalsIgnoreCase(method)); // user information - for other services to use for user authentication and further authorization 
 		return res;
 	}
 	

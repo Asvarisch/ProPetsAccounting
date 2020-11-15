@@ -3,7 +3,6 @@ package telran.ashkelon2020.accounting.service;
 import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,7 +17,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import telran.ashkelon2020.accounting.dto.UserRoleDto;
+import telran.ashkelon2020.accounting.dto.UserInfoDto;
 import telran.ashkelon2020.accounting.dto.exceptions.TokenExpiredException;
 import telran.ashkelon2020.accounting.dto.exceptions.TokenValidateException;
 import telran.ashkelon2020.accounting.model.UserAccount;
@@ -38,16 +37,15 @@ public class TokenServiceJwtImpl implements TokenService {
 
 	@Override
 	public String createToken(UserAccount userAccount) {
-		return Jwts.builder().setId(userAccount.getEmail())
-				.claim("roles", userAccount.getRoles())
-				.setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+		return Jwts.builder()
+				.setId(userAccount.getEmail())
 				.setExpiration(Date.from(ZonedDateTime.now().plusDays(jwtExpiration).toInstant()))
-				.signWith(SignatureAlgorithm.HS256, secretKey).compact();
+				.signWith(SignatureAlgorithm.HS256, secretKey)
+				.compact();
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Override
-	public UserRoleDto validateToken(String token) {
+	public UserInfoDto validateToken(String token) {
 		Jws<Claims> jws;
 		try {
 			jws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -59,9 +57,12 @@ public class TokenServiceJwtImpl implements TokenService {
 		if (date.before((Date.from(ZonedDateTime.now().toInstant())))) {
 			throw new TokenExpiredException();
 		}
-		token = Jwts.builder().setExpiration(Date.from(ZonedDateTime.now().plusDays(jwtExpiration).toInstant()))
+		claims.setExpiration(Date.from(ZonedDateTime.now().plusDays(jwtExpiration).toInstant()));
+		token = Jwts.builder()
+				.setClaims(claims)
+				.signWith(SignatureAlgorithm.HS256, secretKey)
 				.compact();
-		return new UserRoleDto(claims.getId(), (List<String>) claims.get("roles"), token);
+		return new UserInfoDto((String)claims.getId(), token);
 	}
 
 	@Bean

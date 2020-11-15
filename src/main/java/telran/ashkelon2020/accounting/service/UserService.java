@@ -8,14 +8,15 @@ import org.springframework.http.ResponseEntity;
 import telran.ashkelon2020.accounting.dto.RolesResponseDto;
 import telran.ashkelon2020.accounting.dto.UserRegisterDto;
 import telran.ashkelon2020.accounting.dto.UserResponseDto;
-import telran.ashkelon2020.accounting.dto.UserRoleDto;
 import telran.ashkelon2020.accounting.dto.UserUpdateDto;
 
 public interface UserService {
 
 	ResponseEntity<UserResponseDto> addUser(UserRegisterDto userRegisterDto);
+	
+	UserResponseDto login(String login);
 
-	UserResponseDto getUser(String login);
+	ResponseEntity<UserResponseDto> getUserInfo(String login, String token);
 	
 	UserResponseDto editUser(String login, UserUpdateDto userUpdateDto, Principal principal);
 	
@@ -35,7 +36,7 @@ public interface UserService {
 
 	Set<String> getUserData(String login, boolean dataType);
 	
-	ResponseEntity<UserRoleDto> tokenValidate(String token);
+	ResponseEntity<String> tokenValidation(String token);
 
 	
 	

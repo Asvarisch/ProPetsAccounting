@@ -40,6 +40,7 @@ public class AuthenticationFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
+		
 		if (!checkEndpoint(request.getServletPath(), request.getMethod())) {
 			try {
 				String login;

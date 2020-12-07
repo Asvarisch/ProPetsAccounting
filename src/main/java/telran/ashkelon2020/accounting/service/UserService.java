@@ -18,6 +18,7 @@ public interface UserService {
 
 	ResponseEntity<UserResponseDto> getUserInfo(String login, String token);
 	
+	
 	UserResponseDto editUser(String login, UserUpdateDto userUpdateDto, Principal principal);
 	
 	UserResponseDto removeUser(String login);

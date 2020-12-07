@@ -31,9 +31,9 @@ public class Controller {
 	@Autowired
 	UserService accountService;
 
-	//REGISTER USER
+	// REGISTER USER
 	@PostMapping("/registration")
-	public ResponseEntity<UserResponseDto> register(@RequestBody UserRegisterDto userRegisterDto) { 
+	public ResponseEntity<UserResponseDto> register(@RequestBody UserRegisterDto userRegisterDto) {
 		return accountService.addUser(userRegisterDto);
 	}
 
@@ -49,9 +49,11 @@ public class Controller {
 		return accountService.getUserInfo(login, token);
 	}
 
+
 	// EDIT USER PROFILE
 	@PutMapping("/{login}")
-	public UserResponseDto editeUser(@PathVariable String login, @RequestBody UserUpdateDto userUpdateDto, Principal principal) {
+	public UserResponseDto editeUser(@PathVariable String login, @RequestBody UserUpdateDto userUpdateDto,
+			Principal principal) {
 		return accountService.editUser(login, userUpdateDto, principal);
 	}
 

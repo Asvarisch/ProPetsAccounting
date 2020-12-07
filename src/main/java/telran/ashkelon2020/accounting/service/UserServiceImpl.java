@@ -109,10 +109,11 @@ public class UserServiceImpl implements UserService {
 		 * end-of-string
 		 */
 	}
-	
+
 	@Override
 	public UserResponseDto login(String login) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
+	
 		return modelMapper.map(userAccount, UserResponseDto.class);
 	}
 
@@ -122,12 +123,8 @@ public class UserServiceImpl implements UserService {
 		UserResponseDto userResponseDto = modelMapper.map(userAccount, UserResponseDto.class);
 		UserInfoDto userInfoDto = tokenService.validateToken(token);
 		HttpHeaders headers = new HttpHeaders();
-//		headers.add(TOKEN_HEADER, userInfoDto.getToken());
-//		return new ResponseEntity<UserResponseDto>(userResponseDto, headers, HttpStatus.OK);
 		headers.set(TOKEN_HEADER, userInfoDto.getToken());
-		return ResponseEntity.ok()
-				.headers(headers)
-				.body(userResponseDto);
+		return ResponseEntity.ok().headers(headers).body(userResponseDto);
 	}
 
 	@Override
@@ -141,15 +138,15 @@ public class UserServiceImpl implements UserService {
 		}
 		if (userUpdateDto.getPhone() != null && validatePhone(userUpdateDto.getPhone())) {
 			userAccount.setPhone(userUpdateDto.getPhone());
-		}else {
+		} else {
 			throw new IncorrectPhoneException();
 		}
 		repository.save(userAccount);
 		return modelMapper.map(userAccount, UserResponseDto.class);
 	}
 
-	//FIXME
-	private boolean validatePhone(String phone) { 
+	// FIXME
+	private boolean validatePhone(String phone) {
 		String regex = "^((\\+|00)?972\\-?|0)(([23489]|[57]\\d)\\-?\\d{7})$";
 		Pattern pattern = Pattern.compile(regex);
 		boolean res = pattern.matcher(phone).matches();
@@ -165,8 +162,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public RolesResponseDto changeRolesList(String login, String role, boolean isAddRole) {
-		UserAccount userAccount = repository.findById(login)
-				.orElseThrow(() -> new UserNotFoundException(login));
+		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
 		boolean res;
 		if (isAddRole) {
 			res = userAccount.addRole(role.toUpperCase());
@@ -192,19 +188,43 @@ public class UserServiceImpl implements UserService {
 			return false;
 		}
 	}
-	
+
+	// exactly correspond to API
+//	@Override
+//	public ResponseEntity<String> tokenValidation(String token) {
+//		UserInfoDto userInfoDto = tokenService.validateToken(token);
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.add(TOKEN_HEADER, userInfoDto.getToken());
+//		return new ResponseEntity<String>(headers, HttpStatus.OK);
+//	}
+
+	// API change -> add email into response body
+//	@Override
+//	public ResponseEntity<String> tokenValidation(String token) {
+//		UserInfoDto userInfoDto = tokenService.validateToken(token);
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.add(TOKEN_HEADER, userInfoDto.getToken());
+//		return ResponseEntity.ok()
+//				.headers(headers)
+//				.body(userInfoDto.getEmail());
+//	}
+
+	// API change -> we added additional headers with info about user
 	@Override
 	public ResponseEntity<String> tokenValidation(String token) {
 		UserInfoDto userInfoDto = tokenService.validateToken(token);
+		
+		UserAccount userAccount = repository.findById(userInfoDto.getEmail()).orElseThrow(() -> new UserNotFoundException(userInfoDto.getEmail()));
+		UserResponseDto userResponseDto = modelMapper.map(userAccount, UserResponseDto.class);
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(TOKEN_HEADER, userInfoDto.getToken());
 		return new ResponseEntity<String>(headers, HttpStatus.OK);
 	}
 
+	/////////////////////////////////////////// Methods not relevant for Accounting
+	/////////////////////////////////////////// service
+	/////////////////////////////////////////// /////////////////////////////////////////
 
-	/////////////////////////////////////////// Methods not relevant for Accounting service-server /////////////////////////////////////////
-	
-	
 	@Override
 	public void addUserFavoritePost(String login, String id) {
 		UserAccount userAccount = repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
@@ -248,5 +268,4 @@ public class UserServiceImpl implements UserService {
 
 	}
 
-	
 }
